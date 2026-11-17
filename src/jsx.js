@@ -39,10 +39,10 @@ export function readTag(source, index) {
 /** Attribute map: a string for "…" (or {'…'}), { code } for any other {…} expression, true for a bare attribute. */
 export function parseAttrs(attrs) {
     const out = {};
-    const pattern = /([:@\w.-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|\{))?/g;
+    const pattern = /([:@\w.-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|\{|([^\s"'=<>`{}]+)))?/g;
     let match;
     while ((match = pattern.exec(attrs))) {
-        const [whole, name, double, single] = match;
+        const [whole, name, double, single, bare] = match;
         if (whole.endsWith('{')) {
             const open = match.index + whole.length - 1;
             const end = balancedEnd(attrs, open);
@@ -51,7 +51,7 @@ export function parseAttrs(attrs) {
             out[name] = literal ? literal[2] : { code };
             pattern.lastIndex = end < 0 ? attrs.length : end;
         } else {
-            out[name] = double ?? single ?? true;
+            out[name] = double ?? single ?? bare ?? true;
         }
     }
 

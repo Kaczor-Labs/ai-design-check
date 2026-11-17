@@ -12,7 +12,7 @@
 
 **Neden:** Her kısa etikette her kelimenin büyük yazılması bağırır ve Türkçe yazım kuralı değildir. Microsoft Türkçe stil kılavuzu (4.1.5): yalnız özel adlar ve ilk kelime; TDK'de her kelime büyük yalnız eser, belge ve kurum adlarında.
 
-**Nasıl düzeltilir:** Özel adlar (Google İşletme Profili, Search Console), resmî kategori ve belge adları (Sağlık ve Fitness, Gizlilik Politikası), kısaltmalar (AI, SERP) ve dil kodu rozetleri olduğu gibi kalır. Yol ayracından sonraki ilk kelime büyük: "Site sağlığı › Site denetimi".
+**Nasıl düzeltilir:** Özel adlar (Google İşletme Profili, Search Console), resmî kategori ve belge adları (Sağlık ve Fitness, Gizlilik Politikası), kısaltmalar (AI, SERP) ve dil kodu rozetleri olduğu gibi kalır. Yol ayracından sonraki ilk kelime büyük: "Site sağlığı › Site denetimi". macOS uygulamalarında (SwiftUI kaynakları) komutlar, düğmeler ve menü öğeleri Apple yönergelerine göre her kelime büyük yazılır: "Grant Access…"; başlıklar ve diğer metinler yalnız ilk kelime büyük kalır.
 
 ### Süs amaçlı büyük harf ve harf aralığı yok
 
@@ -1108,7 +1108,7 @@
 
 **Neden:** Klavye kullanan kişi nerede olduğunu kaybeder. WCAG 2.4.7 (görünür odak), 2.4.11 (odak gizlenmez).
 
-**Nasıl düzeltilir:** focus-visible:ring-2 (ya da bileşenin odak biçimini) ekleyin; Tailwind 4'te outline-none yerine outline-hidden kullanın, zorlanmış renk kipinde çerçeve kalsın. Odağı programla alan diyalog ve açılır pencere kapsayıcıları muaftır.
+**Nasıl düzeltilir:** focus-visible:ring-2 (ya da bileşenin odak biçimini) ekleyin; Tailwind 4'te outline-none yerine outline-hidden kullanın, zorlanmış renk kipinde çerçeve kalsın. Odağı programla alan diyalog ve açılır pencere kapsayıcıları ile tabindex="-1" taşıyan düz öğeler (denetim olmayan, option ya da tab gibi bir bileşen rolü taşımayan) muaftır.
 
 ### Yalnız ikonlu düğmenin adı vardır
 
@@ -1119,6 +1119,26 @@
 **Neden:** Ekran okuyucu amacı olmadan yalnız "düğme" der; WCAG 4.1.2 ad, rol, değer.
 
 **Nasıl düzeltilir:** Eylemi söyleyen bir aria-label ekleyin ("Kelimeyi sil").
+
+### Görseller alt metni taşır
+
+`img-no-alt` · hata · denetlenir
+
+**Kural:** Her <img> (ve Next'in <Image> bileşeni) bir alt özniteliği taşır: görselin ne gösterdiğini söyleyen sözcükler ya da süs için alt="".
+
+**Neden:** alt yoksa ekran okuyucu dosya adını okur ya da hiçbir şey söylemez. WCAG 1.1.1 metin dışı içerik.
+
+**Nasıl düzeltilir:** Görselin ne gösterdiğini söyleyen bir alt ekleyin ("Önden görünüm, 4. hafta"); yalnız süs olan görsel alt="" alır.
+
+### Tıklama işleyicisi düğme ve bağlantıdadır
+
+`clickable-div` · hata · denetlenir
+
+**Kural:** onClick bir <button>, <a> ya da form öğesine konur. onClick taşıyan div, span, li, td gibi düz bir öğe ayrıca etkileşimli bir rol (button, link, menuitem, tab, checkbox, option, switch…) ya da bir tuş işleyicisi (onKeyDown) taşır.
+
+**Neden:** Düz bir öğeye Tab ile ulaşılamaz, Enter ya da Boşluk ile basılamaz ve ekran okuyucu onu denetim olarak duyurmaz. WCAG 2.1.1 klavye, 4.1.2 ad, rol, değer.
+
+**Nasıl düzeltilir:** Eylem için <button type="button">, gezinme için <a href> kullanın. Öğe kalmak zorundaysa role, tabIndex={0} ve Enter ile Boşluk'u karşılayan bir onKeyDown ekleyin.
 
 ### İki parmakla yakınlaştırma açık kalır
 

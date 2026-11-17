@@ -20,6 +20,7 @@ const values = (rule) => by(rule).map((item) => item.value);
 test('every rule has both languages, a known area and a valid check type', () => {
     const { areas, rules } = loadRules();
     const types = ['render', 'native', 'class', 'regex', 'i18n-case', 'icon-button-name', 'shared-components', 'style-overrides', 'repeated-markup', 'shared-looks', 'min-width-chain', 'merged-leading', 'positioned-scroller', 'snap-padding'];
+    types.push('img-no-alt', 'clickable-div'); // fork-only check types
     for (const rule of rules) {
         assert.ok(areas[rule.area], rule.id);
         for (const field of ['title', 'rule', 'why', 'fix']) assert.ok(rule[field].en && rule[field].tr, `${rule.id}.${field}`);

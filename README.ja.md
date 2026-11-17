@@ -301,7 +301,7 @@ npx @enmera/ai-design-check init     # write a config with the defaults
 ルールは [`rules.json`](rules.json) にあります：`id`、`area`、`severity`、そして `en` と `tr` の `title`、`rule`、`why`、`fix`、さらに任意の `check` です。
 
 - `class`：クラス文字列に対するパターン（またはその一覧）。`unless`、`with`、`exceptElements`、`unlessBefore`、`css` を指定できます。`css` はスタイルシートに対するパターン、または宣言ごとに読む項目（`property`、`value`、`scale`、`hue` 付きの `gradient`、`selector`、`unless`、`unlessRule`）です
-- `native`：`swift` と `kt` の下にプラットフォームごとに 1 つのパターン。`notMultipleOf`、`min`、`max`、`unlessBefore`、`unlessAfter`、`onlyIf` を指定できます
+- `native`：`swift` と `kt` の下にプラットフォームごとに 1 つのパターン。`notMultipleOf`、`min`、`max`、`unlessBefore`、`unlessAfter`、`unlessInside`（一致を囲む呼び出し名）、`onlyIf` を指定できます
 - `regex`：コメントを除いたコードに対するパターン。`flags` と `files` を指定できます
 - または構造的なチェック
 

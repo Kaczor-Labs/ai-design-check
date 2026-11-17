@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.16.3-gg.5
+
+- **`sentence-case` in SwiftUI:** commands, buttons and menu items may keep Title Case, as Apple's guidelines ask (`Button("Grant Access…")`, a `Text` or `Label` inside a `Button`, `Menu`, `.contextMenu` or a call named `…Button`). Headings, rows and other text keep sentence case.
+- **`sentence-case` reads `LocalizedStringResource`:** `LocalizedStringResource("Text")`, `defaultValue:` and `: LocalizedStringResource = "Text"` are checked; a command (inside a button or menu, or assigned to a name with `button`, `action`, `verb`, `command`, `menu`, `confirm` or `cancel`) is exempt.
+- New native option `unlessInside`: skips a match when an enclosing call's name matches. Web files (tsx, jsx, vue, svelte, html, i18n JSON) are unchanged; String Catalogs (`.xcstrings`) are not read for case.
+- The skill commands run `#v0.16.3-gg.5`.
+
+## 0.16.3-gg.4
+
+- The skill commands add `--allow-git=all` (`npx -y --allow-git=all github:kaczordodgers/ai-design-check-gg#v0.16.3-gg.4`), because npm 12 refuses git packages by default; checker code unchanged.
+
+## 0.16.3-gg.3
+
+- The skills run the fork: every command is `npx -y github:kaczordodgers/ai-design-check-gg#v0.16.3-gg.3` instead of `npx @enmera/ai-design-check`; checker code unchanged.
+
+## 0.16.3-gg.2
+
+Review fixes for the fork's rules.
+
+- **`img-no-alt`:** a TypeScript type named `Image` (`useState<Image>`) and React Native's `<Image>` are not flagged; `alt={undefined}` counts as no alt; an unquoted `src=/img/alt` is read as a value; `'<img …>'` inside a JS string is not markup.
+- **`clickable-div`:** every plain HTML element counts (also `svg`, `i`, `strong`, `form`, `table`, `motion.div`), not only a fixed list; buttons, links, form controls, `summary`, `details`, `label`, `option` and hyphenated components never flag. `onClickCapture`, `onMouseDown` and Livewire `wire:click` count as click handlers. A bound Vue role (`:role`, `v-bind:role`) is read, a literal one checked.
+- **Both rules:** only an attribute-level pass-through (`{...props}`, Vue `v-bind="$attrs"`, Blade `{{ $attributes }}`) is skipped; a spread inside a value (`onClick={() => set({ ...s })}`) no longer hides the element.
+- **`focus-ring-removed`:** the `tabindex="-1"` exemption is limited to plain elements with no widget role (a `role="option"` or a `<button>` with `tabIndex={-1}` is still found; a `role="status"` notice focused by script is not); unquoted `tabindex=-1` counts, and `a < b` in an earlier attribute no longer cuts the tag short.
+- Upstream's rule count and plugin versions are left as they are, so upstream releases merge cleanly.
+
+## 0.16.3-gg.1
+
+Fork build on top of 0.16.3.
+
+- **New rule `img-no-alt` (error):** an `<img>` or Next `<Image>` with no `alt` attribute. `alt=""` marks a decorative image and passes; a spread (`{...props}`) may carry the alt and passes.
+- **New rule `clickable-div` (error):** `onClick` / `onclick` (also Vue `@click`, Svelte `on:click`) on a plain element (div, span, li, td, p, section…) with neither an interactive role nor a key handler (`onKeyDown`, `onKeyUp`, `onKeyPress`). Buttons, links and form controls never flag.
+- **`focus-ring-removed`** skips an element with `tabIndex={-1}` / `tabindex="-1"`: it is focused by script and never reached with Tab.
+
 ## 0.16.3
 
 Second round from the Searvia front end (92 addresses, three widths).

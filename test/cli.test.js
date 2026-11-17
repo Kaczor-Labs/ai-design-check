@@ -177,6 +177,106 @@ test('rules read what they promise', () => {
     assert.ok(!rulesIn('g.tsx', 'export const G = () => (<div>{/* <div className="mt-[13px]">old</div> */}</div>);\n').includes('spacing-scale'));
 });
 
+/** Findings of one rule per file: each case is its own file, so one run covers a table of cases. */
+const ruleHits = (rule, files) => {
+    const hits = Object.fromEntries(Object.keys(files).map((name) => [name, 0]));
+    for (const item of JSON.parse(run(project(files), ['--json', ...Object.keys(files)]).stdout).findings) if (item.rule === rule) hits[item.path]++;
+    return hits;
+};
+
+test('img-no-alt: an image needs alt, alt="" is decoration', () => {
+    const hits = ruleHits('img-no-alt', {
+        'flag-html.html': '<img src="a.png">\n',
+        'flag-jsx.tsx': 'export const B = () => <img src={src} className="w-8" />;\n',
+        'flag-next.tsx': 'import Image from "next/image";\nexport const C = () => <Image src={src} width={8} height={8} />;\n',
+        'flag-spread-in-value.tsx': 'export const A = () => <img src={a} style={{ ...base, width: 8 }} />;\n',
+        'flag-unquoted.html': '<img src=/img/alt>\n',
+        'flag-alt-undefined.tsx': 'export const A = () => <img src={a} alt={undefined} />;\n',
+        'pass-alt.html': '<img src="a.png" alt="">\n<img src="b.png" alt="Front view">\n',
+        'pass-jsx.tsx': 'export const E = () => <><img src={src} alt={name} /><Image src={src} alt="" /></>;\n',
+        'pass-spread.tsx': 'export const E = () => <img {...props} />;\n',
+        'pass-vue.vue': '<template><img :src="src" :alt="name"></template>\n',
+        'pass-vue-attrs.vue': '<template><img :src="src" v-bind="$attrs"></template>\n',
+        'pass-blade.blade.php': '<img {{ $attributes }}>\n',
+        'pass-blade-merge.blade.php': '<img {{ $attributes->merge(["class" => "w-8"]) }} src="x">\n',
+        'pass-ts-type.tsx': 'type Image = { url: string };\nexport function A() { const [x] = useState<Image | null>(null); const l: Array<Image> = []; return <p>hi</p>; }\n',
+        'pass-react-native.tsx': 'import { Image, View } from "react-native";\nexport const A = () => <View><Image source={src} src={src} accessibilityLabel="Logo" /></View>;\n',
+        'pass-js-string.tsx': 'const html = \'<img src="x.png">\';\nexport const A = () => <p>{html}</p>;\n',
+    });
+    for (const [name, count] of Object.entries(hits)) assert.equal(count, name.startsWith('flag') ? 1 : 0, name);
+});
+
+test('clickable-div: onClick on a plain element needs a role or key handling', () => {
+    const hits = ruleHits('clickable-div', {
+        'flag-div.tsx': 'export const A = () => <div onClick={open}>Open</div>;\n',
+        'flag-span.html': '<span onclick="go()">Go</span>\n',
+        'flag-role-not-interactive.tsx': 'export const C = () => <li role="presentation" onClick={pick}>One</li>;\n',
+        'flag-spread-in-handler.tsx': 'export const A = () => <div onClick={() => setS({ ...s, open: true })}>Open</div>;\n',
+        'flag-vue.vue': '<template><div @click="open">a</div></template>\n',
+        'flag-vue-on.vue': '<template><li v-on:click.stop="pick">a</li></template>\n',
+        'flag-svelte.svelte': '<div on:click={open}>a</div>\n',
+        'flag-livewire.blade.php': '<li wire:click="pick">x</li>\n',
+        'flag-motion.tsx': 'export const A = () => <motion.div onClick={open}>Open</motion.div>;\n',
+        'flag-svg.tsx': 'export const A = () => <svg onClick={open} />;\n',
+        'flag-icon.tsx': 'export const A = () => <i className="fa fa-times" onClick={close} />;\n',
+        'flag-strong.tsx': 'export const A = () => <strong onClick={o}>x</strong>;\n',
+        'flag-capture.tsx': 'export const A = () => <div onClickCapture={o}>x</div>;\n',
+        'flag-mousedown.tsx': 'export const A = () => <div onMouseDown={o}>x</div>;\n',
+        'pass-role.tsx': 'export const D = () => <div role="button" tabIndex={0} onClick={open}>Open</div>;\n',
+        'pass-role-computed.tsx': 'export const D = () => <div role={role} onClick={open}>Open</div>;\n',
+        'pass-keydown.tsx': 'export const E = () => <td onClick={open} onKeyDown={key}>Open</td>;\n',
+        'pass-keyup.tsx': 'export const E = () => <td onClick={open} onKeyUp={key}>Open</td>;\n',
+        'pass-keypress.tsx': 'export const E = () => <td onClick={open} onKeyPress={key}>Open</td>;\n',
+        'pass-controls.tsx': 'export const F = () => <><button onClick={a}>A</button><a href="/x" onClick={b}>B</a><input onClick={c} /><summary onClick={d}>D</summary><label onClick={e}>E</label></>;\n',
+        'pass-html.html': '<button onclick="go()">Go</button>\n<div onclick="go()" role="link" tabindex="0">Go</div>\n',
+        'pass-spread.tsx': 'export const A = () => <div {...rest} onClick={open}>x</div>;\n',
+        'pass-component.vue': '<template><el-button @click="open">a</el-button></template>\n',
+        'pass-outside.vue': '<template><div @click.outside="close">a</div><div v-on:click.away="close">b</div></template>\n',
+        'pass-vue-role.vue': '<template><div @click="open" :role="\'button\'" tabindex="0">a</div></template>\n',
+        'pass-vue-role-computed.vue': '<template><div @click="open" v-bind:role="r">a</div></template>\n',
+        'pass-vue-keys.vue': '<template><div @click="open" @keydown.enter="open">a</div></template>\n',
+        'pass-vue-attrs.vue': '<template><div @click="open" v-bind="$attrs">a</div></template>\n',
+        'pass-js-string.tsx': 'const html = \'<div onclick="go()">x</div>\';\nexport const A = () => <p>{html}</p>;\n',
+    });
+    for (const [name, count] of Object.entries(hits)) assert.equal(count, name.startsWith('flag') ? 1 : 0, name);
+});
+
+test('focus-ring-removed skips tabindex="-1" on a plain element: focused by script, never by Tab', () => {
+    const hits = ruleHits('focus-ring-removed', {
+        'pass-jsx.tsx': 'export const A = () => <h1 ref={ref} tabIndex={-1} className="outline-none">Title</h1>;\n',
+        'pass-html.html': '<main tabindex="-1" class="outline-none">x</main>\n',
+        'pass-unquoted.html': '<main tabindex=-1 class="outline-none">x</main>\n',
+        'pass-string.tsx': 'export const A = () => <div tabIndex={"-1"} className="outline-none">x</div>;\n',
+        'pass-live-region.tsx': 'export const A = () => <p ref={ref} role="status" tabIndex={-1} className="outline-none">Saved</p>;\n',
+        'pass-less-than.tsx': 'export const A = () => <div tabIndex={-1} onChange={() => a < b} className="outline-none">x</div>;\n',
+        'flag-zero.tsx': 'export const C = () => <div tabIndex={0} className="outline-none">x</div>;\n',
+        'flag-none.tsx': 'export const D = () => <div className="outline-none">x</div>;\n',
+        'flag-option.tsx': 'export const A = () => <li role="option" tabIndex={-1} className="outline-none">x</li>;\n',
+        'flag-button.tsx': 'export const A = () => <button tabIndex={-1} className="outline-none">x</button>;\n',
+    });
+    for (const [name, count] of Object.entries(hits)) assert.equal(count, name.startsWith('flag') ? 1 : 0, name);
+});
+
+test('sentence-case: macOS commands, buttons and menu items keep Title Case; the web stays sentence case', () => {
+    const casesIn = (name, content) => JSON.parse(run(project({ [name]: content }), ['--json', name]).stdout).findings.filter((item) => item.rule === 'sentence-case').map((item) => item.value);
+    const swift = [
+        'Button("Grant Access…") {}',
+        'Button { open() } label: { Label("Show in Finder", systemImage: "folder") }',
+        'Button(action: open) { HStack { Text("Insert Placeholder") } }',
+        'Menu("More Options") { Toggle("Web Search", isOn: $on) }',
+        'Text("Copy Chat").contextMenu { Text("Copy Deeplink") }',
+        'PrimaryButton(title: "Open Settings")',
+        'Button(LocalizedStringResource("grant", defaultValue: "Grant Access…")) {}',
+        'let openVerb: LocalizedStringResource = "Open Folder"',
+    ].join('\n');
+    assert.deepEqual(casesIn('a.swift', `${swift}\n`), ['Text("Copy Chat"']);
+    // Not a command: headings, rows and LocalizedStringResource text keep sentence case.
+    assert.deepEqual(casesIn('b.swift', 'LabeledContent { Button("Add Header") {} } label: { Text("Request Headers") }\nlet title: LocalizedStringResource = "Upcoming Payments"\nlet hint = LocalizedStringResource("hint", defaultValue: "Recent Activity")\n'), ['Text("Request Headers"', 'LocalizedStringResource = "Upcoming Payments"', 'LocalizedStringResource("hint", defaultValue: "Recent Activity"']);
+    assert.deepEqual(casesIn('c.tsx', 'export const C = () => <Button label="Grant Access" title="Show In Finder" />;\n'), ['Grant Access', 'Show In Finder']);
+    // A String Catalog is never read for case.
+    assert.deepEqual(casesIn('Localizable.xcstrings', JSON.stringify({ sourceLanguage: 'en', strings: { 'Grant Access…': { localizations: { de: { stringUnit: { state: 'translated', value: 'Zugriff Gewähren…' } } } } } })), []);
+});
+
 test('a one-line ignore covers one line outside a tag, and a whole unfinished tag', () => {
     const code = 'export const A = () => <div>\n{/* ai-design-check-ignore-next-line spacing-scale -- why */}\n<p>x</p>\n<p className="mt-[13px]">y</p>\n</div>;\n';
     assert.equal(spacingOf(run(project({ 'a.tsx': code }), ['--json'])).length, 1);

@@ -117,6 +117,59 @@ function titleCased(text, properNouns) {
     return words.length >= 2 && rest.length > 0 && rest.every((word) => /^\p{Lu}/u.test(word) && !/^\p{Lu}+$/u.test(word));
 }
 
+const OPEN = { ')': '(', '}': '{', ']': '[' };
+
+/** Index of the bracket that opens the one closing at `end`, or -1. */
+function opener(code, end) {
+    let depth = 0;
+    for (let i = end; i >= 0; i--) {
+        if (OPEN[code[i]]) depth++;
+        else if ('({['.includes(code[i]) && --depth === 0) return i;
+    }
+
+    return -1;
+}
+
+/** Name of the call a bracket opens: `Button(`, `Button {`, `Button(…) {`, `.contextMenu {`, `} label: {`. */
+function callOf(code, open) {
+    const back = (end) => {
+        while (end >= 0 && /\s/u.test(code[end])) end--;
+        return end;
+    };
+    for (let guard = 0; guard < 8; guard++) {
+        let end = back(open - 1);
+        const label = code[open] === '{' ? /\b\w+:$/u.exec(code.slice(Math.max(0, end - 40), end + 1)) : null;
+        if (label) {
+            end = back(end - label[0].length);
+            // `f(x: {` is an argument: the `(` that encloses it names the call.
+            if (code[end] !== '}') return undefined;
+        }
+        if (code[end] !== ')' && code[end] !== '}') return /(\w+)$/u.exec(code.slice(Math.max(0, end - 60), end + 1))?.[1];
+        open = opener(code, end);
+        if (open < 0) return undefined;
+    }
+
+    return undefined;
+}
+
+/** Names of the calls whose brackets enclose `index`, innermost first. */
+function enclosingCalls(code, index) {
+    const names = [];
+    let depth = 0;
+    for (let i = index - 1; i >= 0; i--) {
+        if (OPEN[code[i]]) depth++;
+        else if ('({['.includes(code[i])) {
+            if (depth > 0) depth--;
+            else {
+                const name = callOf(code, i);
+                if (name) names.push(name);
+            }
+        }
+    }
+
+    return names;
+}
+
 /** Minimal glob: ** any depth, * within a segment, ? one character. */
 export function globToRegExp(glob) {
     let out = '';
@@ -339,6 +392,55 @@ function checkMarkupIconButtons(path, source, report) {
         const closeButton = CLOSE_BUTTON.test(typeof attrs.class === 'string' ? attrs.class : '');
         if (!(closeButton || MARKUP_ICON.test(content)) || CHILD_NAME.test(content) || visibleText(content) !== '') continue;
         report('icon-button-name', path, lineOf(source, tag.start), tag.name, closeButton ? CLOSE_MESSAGE : `Icon-only <${tag.name}> has no aria-label`);
+    }
+}
+
+/** Attributes as written in HTML, JSX, Vue (:alt, @click), Alpine, Livewire (wire:click) and Svelte (on:click), by lower-case name. */
+function attrsOf(text) {
+    const out = {};
+    for (let [name, value] of Object.entries(parseAttrs(text))) {
+        // A bound Vue/Alpine value is code; a quoted literal in it (:role="'button'") reads as the plain string.
+        if (/^(?:v-bind:|x-bind:|:)/.test(name) && typeof value === 'string') value = /^\s*(['"`])([^'"`$]*)\1\s*$/.exec(value)?.[2] ?? { code: value };
+        out[name.replace(/^(?:v-bind:|x-bind:|:)/, '').replace(/^(?:v-on:|x-on:|wire:|@|on:)/, 'on').toLowerCase()] = value;
+    }
+
+    return out;
+}
+
+/** A pass-through that may carry any attribute: {...props}, Vue v-bind="$attrs", Blade {{ $attributes }}. A spread inside a value ({() => set({ ...s })}) is not one. */
+function passesThrough(text, attrs) {
+    return Object.keys(attrs).some((name) => name.startsWith('...') || name === 'v-bind' || name === 'x-bind') || /\{\{\s*\$attributes\b/.test(text);
+}
+
+/** Tags written as markup; '<img …>' inside a JS string is not one. */
+const markupTags = (source, names) => [...tags(source, names)].filter((tag) => !`'"\``.includes(source[tag.start - 1]));
+
+/** An image with no alt at all; alt="" is a decorative image and passes. */
+function checkImageAlt(path, source, report) {
+    for (const tag of markupTags(source, ['img', 'Image'])) {
+        const attrs = attrsOf(tag.attrs);
+        // <Image> without src is a type (useState<Image>), not Next's component.
+        if ((tag.name === 'Image' && !('src' in attrs)) || passesThrough(tag.attrs, attrs)) continue;
+        if (attrs.alt !== undefined && !/^(?:undefined|null)$/.test(attrs.alt?.code ?? '')) continue;
+        report('img-no-alt', path, lineOf(source, tag.start), tag.name, `<${tag.name}> has no alt`);
+    }
+}
+
+/** Elements that are controls themselves; every other HTML element (and motion.div, animated.span) is plain. */
+const INTERACTIVE_TAG = /^(?:a|area|button|input|select|textarea|summary|details|label|option)$/;
+const INTERACTIVE_ROLE = /^(?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|checkbox|radio|option|switch|treeitem|gridcell|combobox|slider|spinbutton|textbox|searchbox)$/;
+
+/** A click handler on a plain element is unreachable by keyboard unless it adds a role or key handling. */
+function checkClickables(path, source, report) {
+    // Lower case without a hyphen: HTML elements, not Vue's <el-button> or web components.
+    const names = new Set([...source.matchAll(/<((?:motion\.|animated\.)?[a-z][a-z0-9]*)(?=[\s/>])/g)].map((match) => match[1]).filter((name) => !INTERACTIVE_TAG.test(name)));
+    for (const tag of markupTags(source, [...names])) {
+        const attrs = attrsOf(tag.attrs);
+        const handlers = Object.keys(attrs);
+        if (!handlers.some((name) => /^on(?:click(?:capture)?|mousedown)(?:\.(?!outside|away)|$)/.test(name)) || passesThrough(tag.attrs, attrs)) continue;
+        // A computed role ({role}) is trusted; a written one must be interactive.
+        if ((attrs.role !== undefined && (typeof attrs.role !== 'string' || INTERACTIVE_ROLE.test(attrs.role.trim()))) || handlers.some((name) => /^onkey(?:down|up|press)/.test(name))) continue;
+        report('clickable-div', path, lineOf(source, tag.start), tag.name, `onClick on a <${tag.name}> with no role or key handler: use a <button> or <a>`);
     }
 }
 
@@ -806,7 +908,9 @@ export function check(cwd, overrides = {}) {
                     // The element's own attributes can rule it out (type="file" has no text to zoom on).
                     if (check.unlessTag) {
                         const next = source.indexOf('<', unit.index);
-                        if (new RegExp(check.unlessTag, 'u').test(source.slice(source.lastIndexOf('<', unit.index), next < 0 ? undefined : next))) continue;
+                        let open = source.lastIndexOf('<', unit.index);
+                        while (open > 0 && !/[A-Za-z]/.test(source[open + 1])) open = source.lastIndexOf('<', open - 1); // a < b in a handler
+                        if (new RegExp(check.unlessTag, 'u').test(source.slice(open, next < 0 ? undefined : next))) continue;
                     }
                     // A wrapper just above may carry the style (focus-within: ring on the box around an input).
                     if (check.unlessBefore && new RegExp(check.unlessBefore, 'u').test(source.slice(Math.max(0, unit.index - 1500), unit.index))) continue;
@@ -883,6 +987,7 @@ export function check(cwd, overrides = {}) {
                 const after = code.slice(match.index + match[0].length, match.index + match[0].length + 300);
                 if (native.unlessBefore && new RegExp(native.unlessBefore, 'u').test(before)) continue;
                 if (native.unlessAfter && new RegExp(native.unlessAfter, 'u').test(after)) continue;
+                if (native.unlessInside && enclosingCalls(code, match.index).some((name) => new RegExp(native.unlessInside, 'u').test(name))) continue;
                 // Only where the context makes it count (a size on something tappable): either side may match.
                 if (native.onlyIf && !((native.onlyIf.before && new RegExp(native.onlyIf.before, 'u').test(before)) || (native.onlyIf.after && new RegExp(native.onlyIf.after, 'u').test(after)))) continue;
                 // A corner of half the box's width is a circle, not a guess.
@@ -907,6 +1012,8 @@ export function check(cwd, overrides = {}) {
         if (on('sentence-case') && config.labels && ['tsx', 'jsx', 'vue', 'svelte'].includes(extension)) checkLabels(config, path, source, report);
         if (reactNative && JSX.includes(extension)) checkTouchables(path, code, report);
         if (on('icon-button-name') && HTML_LIKE.includes(extension)) checkMarkupIconButtons(path, source, report);
+        if (on('img-no-alt') && markup && !reactNative) checkImageAlt(path, source, report);
+        if (on('clickable-div') && markup) checkClickables(path, source, report);
         if (on('cell-holds-content') && MARKUP.includes(extension)) checkMinWidthChain(chain, path, source, raw, report);
         if (on('scroller-holds-absolute') && MARKUP.includes(extension)) checkScrollerPosition(path, source, report);
         if (on('leading-survives-merge') && (MARKUP.includes(extension) || SCRIPT.includes(extension))) checkMergedLeading(path, source, report);

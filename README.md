@@ -443,7 +443,7 @@ optional `check`:
 - `class`: a pattern on class strings (or a list of them), with `unless`, `with`, `exceptElements`, `unlessBefore`, and `css`:
   a pattern on stylesheets, or entries read declaration by declaration (`property`, `value`, `scale`, `gradient` with `hue`,
   `selector`, `unless`, `unlessRule`)
-- `native`: one pattern per platform under `swift` and `kt`, with `notMultipleOf`, `min`, `max`, `unlessBefore`, `unlessAfter`
+- `native`: one pattern per platform under `swift` and `kt`, with `notMultipleOf`, `min`, `max`, `unlessBefore`, `unlessAfter`, `unlessInside` (a call name around the match)
   and `onlyIf`
 - `regex`: a pattern on code with comments excluded, with `flags` and `files`
 - or a structural check

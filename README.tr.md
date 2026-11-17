@@ -450,7 +450,7 @@ Kurallar [`rules.json`](rules.json) içinde: `id`, `area`, `severity`, `en` ve `
 - `class`: sınıf dizgisinde desen (ya da desen listesi); `unless`, `with`, `exceptElements`, `unlessBefore` ve `css` ile.
   `css` stil dosyalarında bir desendir ya da bildirim bildirim okunan girdilerdir (`property`, `value`, `scale`, `hue` ile
   `gradient`, `selector`, `unless`, `unlessRule`)
-- `native`: `swift` ve `kt` altında platform başına desen; `notMultipleOf`, `min`, `max`, `unlessBefore`, `unlessAfter`, `onlyIf` ile
+- `native`: `swift` ve `kt` altında platform başına desen; `notMultipleOf`, `min`, `max`, `unlessBefore`, `unlessAfter`, `unlessInside` (eşleşmeyi saran çağrı adı), `onlyIf` ile
 - `regex`: yorumlar hariç kodda desen; `flags` ve `files` ile
 - ya da yapısal denetim
 

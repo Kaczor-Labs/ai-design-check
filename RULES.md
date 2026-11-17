@@ -12,7 +12,7 @@
 
 **Why:** Title Case on every short label reads loud and is not Turkish (or modern English UI) style. Microsoft's Turkish style guide: only proper nouns and the first word.
 
-**How to fix:** Keep proper names (Google Business Profile, Search Console), official category and document names, abbreviations (AI, SERP) and language-code badges as they are. After a path separator the first word stays capitalised: "Site health › Site audit".
+**How to fix:** Keep proper names (Google Business Profile, Search Console), official category and document names, abbreviations (AI, SERP) and language-code badges as they are. After a path separator the first word stays capitalised: "Site health › Site audit". In macOS apps (SwiftUI sources) commands, buttons and menu items take Title Case, as Apple's guidelines ask: "Grant Access…", "Show in Finder"; headings and other text keep sentence case.
 
 ### No tracked uppercase labels
 
@@ -1108,7 +1108,7 @@
 
 **Why:** Keyboard users lose their place. WCAG 2.4.7 (focus visible), 2.4.11 (focus not obscured).
 
-**How to fix:** Add focus-visible:ring-2 (or the component's focus style); prefer outline-hidden over outline-none in Tailwind 4 so forced-colours mode keeps an outline. Dialog and popover containers receive focus programmatically and are exempt.
+**How to fix:** Add focus-visible:ring-2 (or the component's focus style); prefer outline-hidden over outline-none in Tailwind 4 so forced-colours mode keeps an outline. Dialog and popover containers, and plain elements with tabindex="-1" (not a control, no widget role such as option or tab), receive focus programmatically and are exempt.
 
 ### Icon-only buttons have a name
 
@@ -1119,6 +1119,26 @@
 **Why:** Screen readers announce "button" with no purpose; WCAG 4.1.2 name, role, value.
 
 **How to fix:** Add aria-label with the action in sentence case ("Delete keyword").
+
+### Images carry alt text
+
+`img-no-alt` · error · checked
+
+**Rule:** Every <img> (and Next's <Image>) has an alt attribute: words that say what the image shows, or alt="" for decoration.
+
+**Why:** Without alt a screen reader reads the file name or nothing at all. WCAG 1.1.1 non-text content.
+
+**How to fix:** Add alt with what the image shows ("Front view, week 4"); a purely decorative image gets alt="".
+
+### Click handlers sit on buttons and links
+
+`clickable-div` · error · checked
+
+**Rule:** onClick goes on a <button>, <a> or form control. A div, span, li, td or other plain element with onClick also carries an interactive role (button, link, menuitem, tab, checkbox, option, switch…) or a key handler (onKeyDown).
+
+**Why:** A plain element cannot be reached with Tab or pressed with Enter or Space, and a screen reader does not announce it as a control. WCAG 2.1.1 keyboard, 4.1.2 name, role, value.
+
+**How to fix:** Use a <button type="button"> for an action and an <a href> for navigation. If the element must stay, add role, tabIndex={0} and an onKeyDown that handles Enter and Space.
 
 ### Pinch zoom stays on
 

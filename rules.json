@@ -76,16 +76,25 @@
         "tr": "Her kısa etikette her kelimenin büyük yazılması bağırır ve Türkçe yazım kuralı değildir. Microsoft Türkçe stil kılavuzu (4.1.5): yalnız özel adlar ve ilk kelime; TDK'de her kelime büyük yalnız eser, belge ve kurum adlarında."
       },
       "fix": {
-        "en": "Keep proper names (Google Business Profile, Search Console), official category and document names, abbreviations (AI, SERP) and language-code badges as they are. After a path separator the first word stays capitalised: \"Site health › Site audit\".",
-        "tr": "Özel adlar (Google İşletme Profili, Search Console), resmî kategori ve belge adları (Sağlık ve Fitness, Gizlilik Politikası), kısaltmalar (AI, SERP) ve dil kodu rozetleri olduğu gibi kalır. Yol ayracından sonraki ilk kelime büyük: \"Site sağlığı › Site denetimi\"."
+        "en": "Keep proper names (Google Business Profile, Search Console), official category and document names, abbreviations (AI, SERP) and language-code badges as they are. After a path separator the first word stays capitalised: \"Site health › Site audit\". In macOS apps (SwiftUI sources) commands, buttons and menu items take Title Case, as Apple's guidelines ask: \"Grant Access…\", \"Show in Finder\"; headings and other text keep sentence case.",
+        "tr": "Özel adlar (Google İşletme Profili, Search Console), resmî kategori ve belge adları (Sağlık ve Fitness, Gizlilik Politikası), kısaltmalar (AI, SERP) ve dil kodu rozetleri olduğu gibi kalır. Yol ayracından sonraki ilk kelime büyük: \"Site sağlığı › Site denetimi\". macOS uygulamalarında (SwiftUI kaynakları) komutlar, düğmeler ve menü öğeleri Apple yönergelerine göre her kelime büyük yazılır: \"Grant Access…\"; başlıklar ve diğer metinler yalnız ilk kelime büyük kalır."
       },
       "check": {
         "type": "i18n-case",
         "native": {
-          "swift": {
-            "pattern": "(?:\\b(?:Text|Label|Button|Section|Toggle|navigationTitle)\\(\\s*|\\b(?:title|linkTitle|label):\\s*)\"([^\"\\\\\\n]{3,40})\"",
-            "titleCase": true
-          },
+          "swift": [
+            {
+              "pattern": "(?:\\b(?:Text|Label|Section|Toggle|navigationTitle)\\(\\s*|\\b(?:title|linkTitle|label):\\s*)\"([^\"\\\\\\n]{3,40})\"",
+              "titleCase": true,
+              "unlessInside": "^(?:\\w*Button|Menu\\w*|contextMenu|CommandMenu|CommandGroup)$"
+            },
+            {
+              "pattern": "\\bLocalizedStringResource(?:\\(\\s*(?:\"[^\"\\\\\\n]*\"\\s*,\\s*defaultValue:\\s*)?|\\??\\s*[={]\\s*)\"([^\"\\\\\\n]{3,40})\"",
+              "titleCase": true,
+              "unlessBefore": "(?:[Bb]utton|[Aa]ction|[Vv]erb|[Cc]ommand|[Mm]enu|[Cc]onfirm|[Cc]ancel)\\w*\\s*:\\s*$",
+              "unlessInside": "^(?:\\w*Button|Menu\\w*|contextMenu|CommandMenu|CommandGroup)$"
+            }
+          ],
           "kt": {
             "pattern": "(?:\\bText\\(\\s*(?:text\\s*=\\s*)?|\\b(?:title|label)\\s*=\\s*)\"([^\"\\\\$\\n]{3,40})\"",
             "titleCase": true
@@ -1027,8 +1036,8 @@
         "tr": "Klavye kullanan kişi nerede olduğunu kaybeder. WCAG 2.4.7 (görünür odak), 2.4.11 (odak gizlenmez)."
       },
       "fix": {
-        "en": "Add focus-visible:ring-2 (or the component's focus style); prefer outline-hidden over outline-none in Tailwind 4 so forced-colours mode keeps an outline. Dialog and popover containers receive focus programmatically and are exempt.",
-        "tr": "focus-visible:ring-2 (ya da bileşenin odak biçimini) ekleyin; Tailwind 4'te outline-none yerine outline-hidden kullanın, zorlanmış renk kipinde çerçeve kalsın. Odağı programla alan diyalog ve açılır pencere kapsayıcıları muaftır."
+        "en": "Add focus-visible:ring-2 (or the component's focus style); prefer outline-hidden over outline-none in Tailwind 4 so forced-colours mode keeps an outline. Dialog and popover containers, and plain elements with tabindex=\"-1\" (not a control, no widget role such as option or tab), receive focus programmatically and are exempt.",
+        "tr": "focus-visible:ring-2 (ya da bileşenin odak biçimini) ekleyin; Tailwind 4'te outline-none yerine outline-hidden kullanın, zorlanmış renk kipinde çerçeve kalsın. Odağı programla alan diyalog ve açılır pencere kapsayıcıları ile tabindex=\"-1\" taşıyan düz öğeler (denetim olmayan, option ya da tab gibi bir bileşen rolü taşımayan) muaftır."
       },
       "check": {
         "type": "class",
@@ -1042,6 +1051,7 @@
         ],
         "unless": "(?:focus-visible|focus|focus-within|group-focus-visible|peer-focus-visible|data-focus-visible|data-\\[focus-visible\\]|data-\\[focused\\]|data-focused|has-focus-visible):(?:ring(?!-0(?:\\s|$))|outline(?!-none|-hidden|-0)|shadow(?!-none)|border|bg|underline)",
         "exceptElements": "^(?:\\w*(?:Dialog|Popover|Modal|Sheet|Drawer|Menu|ListBox|Listbox|Tooltip|Command|Overlay|Popup|Viewport|Panel)\\w*|[A-Z]\\w*Content)$",
+        "unlessTag": "^<(?!(?:[bB]utton|a|input|select|textarea|summary)\\b)(?![\\s\\S]*\\brole\\s*=\\s*\\{?\\s*[\"'](?:button|link|menuitem|menuitemcheckbox|menuitemradio|tab|checkbox|radio|option|switch|treeitem|gridcell|combobox|slider|spinbutton|textbox|searchbox)[\"'])[\\s\\S]*\\btab[iI]ndex\\s*=\\s*(?:\\{\\s*-1\\s*\\}|[\"']-1[\"']|-1\\b|\\{\\s*[\"']-1[\"']\\s*\\})",
         "unlessBefore": "(?:focus-within|has-\\[:focus-visible\\]|has-focus-visible|has-\\[\\[[^\\]]*\\]:focus-visible\\]):(?:ring|outline|shadow|border)",
         "css": [
           {
@@ -1088,6 +1098,54 @@
             "unlessAfter": "^(?:(?!IconButton)[\\s\\S]){0,200}?\\btooltip:"
           }
         }
+      }
+    },
+    {
+      "id": "img-no-alt",
+      "area": "accessibility",
+      "severity": "error",
+      "title": {
+        "en": "Images carry alt text",
+        "tr": "Görseller alt metni taşır"
+      },
+      "rule": {
+        "en": "Every <img> (and Next's <Image>) has an alt attribute: words that say what the image shows, or alt=\"\" for decoration.",
+        "tr": "Her <img> (ve Next'in <Image> bileşeni) bir alt özniteliği taşır: görselin ne gösterdiğini söyleyen sözcükler ya da süs için alt=\"\"."
+      },
+      "why": {
+        "en": "Without alt a screen reader reads the file name or nothing at all. WCAG 1.1.1 non-text content.",
+        "tr": "alt yoksa ekran okuyucu dosya adını okur ya da hiçbir şey söylemez. WCAG 1.1.1 metin dışı içerik."
+      },
+      "fix": {
+        "en": "Add alt with what the image shows (\"Front view, week 4\"); a purely decorative image gets alt=\"\".",
+        "tr": "Görselin ne gösterdiğini söyleyen bir alt ekleyin (\"Önden görünüm, 4. hafta\"); yalnız süs olan görsel alt=\"\" alır."
+      },
+      "check": {
+        "type": "img-no-alt"
+      }
+    },
+    {
+      "id": "clickable-div",
+      "area": "accessibility",
+      "severity": "error",
+      "title": {
+        "en": "Click handlers sit on buttons and links",
+        "tr": "Tıklama işleyicisi düğme ve bağlantıdadır"
+      },
+      "rule": {
+        "en": "onClick goes on a <button>, <a> or form control. A div, span, li, td or other plain element with onClick also carries an interactive role (button, link, menuitem, tab, checkbox, option, switch…) or a key handler (onKeyDown).",
+        "tr": "onClick bir <button>, <a> ya da form öğesine konur. onClick taşıyan div, span, li, td gibi düz bir öğe ayrıca etkileşimli bir rol (button, link, menuitem, tab, checkbox, option, switch…) ya da bir tuş işleyicisi (onKeyDown) taşır."
+      },
+      "why": {
+        "en": "A plain element cannot be reached with Tab or pressed with Enter or Space, and a screen reader does not announce it as a control. WCAG 2.1.1 keyboard, 4.1.2 name, role, value.",
+        "tr": "Düz bir öğeye Tab ile ulaşılamaz, Enter ya da Boşluk ile basılamaz ve ekran okuyucu onu denetim olarak duyurmaz. WCAG 2.1.1 klavye, 4.1.2 ad, rol, değer."
+      },
+      "fix": {
+        "en": "Use a <button type=\"button\"> for an action and an <a href> for navigation. If the element must stay, add role, tabIndex={0} and an onKeyDown that handles Enter and Space.",
+        "tr": "Eylem için <button type=\"button\">, gezinme için <a href> kullanın. Öğe kalmak zorundaysa role, tabIndex={0} ve Enter ile Boşluk'u karşılayan bir onKeyDown ekleyin."
+      },
+      "check": {
+        "type": "clickable-div"
       }
     },
     {
