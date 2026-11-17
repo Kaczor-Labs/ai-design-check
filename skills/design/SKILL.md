@@ -15,7 +15,9 @@ Apply these rules whenever you build, change or review interface code.
 3. Reuse the project's components for the selector language: segmented control for the primary choice, plain
    sub-tabs on the same row, pill chips only for filters (`selector-language`).
 4. Know the context: an app screen (dashboard, settings, tables) is dense and quiet; a marketing page may use display
-   type and more colour. If the project has a DESIGN.md or a brief, it wins over these defaults.
+   type and more colour. If the project has a DESIGN.md or a brief, it wins over these defaults. In a project that
+   uses OBSIDIAN (gg-app, gainsgeek.com), the `design-system` skill wins wherever its rules differ from these (for
+   example, OBSIDIAN allows uppercase for small labels and table column headers).
 5. Run `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 inventory` once: it shows the looks that already exist for buttons, inputs,
    headings, badges and cards. Use one of those; do not invent another.
 
@@ -33,7 +35,7 @@ Apply these rules whenever you build, change or review interface code.
 - On phones: pinch zoom stays on, fields use 16 px text, a fixed `100vh` has a `dvh` partner, nothing is reachable only by
   hover. Hover, press and open answer within 300 ms; nothing loops forever without a reason.
 - Spacing on the project's scale (4 px when it has none); copy without exclamation marks, greetings as titles or unsourced social proof.
-- To clean up a screen that already looks generated, use the `ai-design-fix` skill.
+- To clean up a screen that already looks generated, use the `unslop` skill.
 - Wide tables take the full width with the last column absorbing spare width; uneven cards go into a grid masonry.
 - Headline numbers say what they are compared with; empty data shows an empty state.
 
