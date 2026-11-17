@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.3-fork.1
+
+- The fork lives at `kaczordodgers/ai-design-check`; the skill commands run `github:kaczordodgers/ai-design-check#v0.16.3-fork.1`. Checker code unchanged from 0.16.3-gg.5.
+
 ## 0.16.3-gg.5
 
 - **`sentence-case` in SwiftUI:** commands, buttons and menu items may keep Title Case, as Apple's guidelines ask (`Button("Grant Access…")`, a `Text` or `Label` inside a `Button`, `Menu`, `.contextMenu` or a call named `…Button`). Headings, rows and other text keep sentence case.
