@@ -32,14 +32,14 @@ When the user names a symptom, begin where it points, then carry on from step 1.
 2. Run the checker on exactly those files and keep the numbers:
 
    ```bash
-   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 path/to/screen.tsx --json
+   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 path/to/screen.tsx --json
    ```
 
-3. Take the mechanical part off the list first: `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 path/to/screen.tsx --fix` moves spacing and
+3. Take the mechanical part off the list first: `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 path/to/screen.tsx --fix` moves spacing and
    corners to the nearest step and very heavy type to bold, with no judgement. Read the changes it prints, then keep going
    on what remains. Run the first count before this, so the report shows the whole change.
 
-4. If the page runs, `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 scan <url>` reports what only a browser sees: real contrast, tiny text, what
+4. If the page runs, `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 scan <url>` reports what only a browser sees: real contrast, tiny text, what
    covers what, script errors. Then look at the screen at desktop and phone width (a browser tool, Playwright, or the user's screenshot). The rules
    marked *review* need eyes: `one-accent`, `nested-radius`, `hero-one-action`, `show-the-product`,
    `no-badge-spam`, `selector-language`, `empty-states`, `legible-contrast`, `readable-measure`, `spacing-rhythm`,
@@ -75,7 +75,7 @@ section before you edit:
 Show the cards to the owner with the brief. Anything you could not find on the site is a question, not a guess.
 
 When the project has no tokens yet (no type scale, no colour variables), generate them from the brief instead of
-inventing values: `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 system --character <calm|precise|friendly|warm|bold|editorial|luxurious|playful|technical|trustworthy> --brand "<hex>" --kind <dashboard|app|marketing|reading>`.
+inventing values: `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 system --character <calm|precise|friendly|warm|bold|editorial|luxurious|playful|technical|trustworthy> --brand "<hex>" --kind <dashboard|app|marketing|reading>`.
 It writes CSS, Tailwind, SwiftUI and Compose tokens whose text colours already pass contrast; `--json` prints them.
 
 For a large change, show the audit and the brief and let the user steer before editing. For a small screen or
@@ -129,7 +129,7 @@ is worse than one that looks plain, so looks come last. Reuse the project's comp
 2. Render it at phone width with the longest language the product ships (German, Finnish):
 
    ```bash
-   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 narrow path/to/page.html --width 320 --stress
+   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 narrow path/to/page.html --width 320 --stress
    ```
 
    It reports the page scrolling sideways, cut-off text, text shrunk to fit and content hidden on phones; `--stress` runs
@@ -141,7 +141,7 @@ is worse than one that looks plain, so looks come last. Reuse the project's comp
    dependencies):
 
    ```bash
-   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.1 story screen.before.html screen.html --out story.mp4
+   npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 story screen.before.html screen.html --out story.mp4
    ```
 
    It takes files or URLs, marks every finding on the before screen, wipes to the after screen and counts down.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.3-fork.2
+
+- Skill `design`: Notchcast joins the projects where the `design-system` skill (OBSIDIAN) wins; step 1 runs the `rules` command, since an installed skill folder carries no `RULES.md`. The skill commands run `#v0.16.3-fork.2`. Checker code unchanged.
+
 ## 0.16.3-fork.1
 
 - The fork lives at `kaczordodgers/ai-design-check`; the skill commands run `github:kaczordodgers/ai-design-check#v0.16.3-fork.1`. Checker code unchanged from 0.16.3-gg.5.
