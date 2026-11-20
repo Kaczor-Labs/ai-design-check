@@ -59,4 +59,4 @@ at desktop and phone width) before calling the work done.
 ## Adding to the rules
 
 When the user corrects a design decision that is general, propose adding it to `rules.json` of this package
-(with `why` and `fix` in English and Turkish) so the next project gets it too.
+(with `why` and `fix` in English) so the next project gets it too.
