@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Skill `design`: a proposed `rules.json` entry needs `why` and `fix` in English only; the Turkish texts are no longer asked for. Checker code unchanged.
+
 ## 0.16.3-fork.2
 
 - Skill `design`: Notchcast joins the projects where the `design-system` skill (OBSIDIAN) wins; step 1 runs the `rules` command, since an installed skill folder carries no `RULES.md`. The skill commands run `#v0.16.3-fork.2`. Checker code unchanged.
