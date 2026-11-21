@@ -9,7 +9,7 @@ Apply these rules whenever you build, change or review interface code.
 
 ## Before you write UI
 
-1. Run `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 rules` and read the rules it prints.
+1. Run `npx -y --allow-git=all github:Kaczor-Labs/ai-design-check#v0.16.3-fork.2 rules` and read the rules it prints.
 2. Decide the place first: which menu section, its own row or a tab of an existing page, which URL prefix
    (`menu-by-job`). State the decision in one line before writing code.
 3. Reuse the project's components for the selector language: segmented control for the primary choice, plain
@@ -18,7 +18,7 @@ Apply these rules whenever you build, change or review interface code.
    type and more colour. If the project has a DESIGN.md or a brief, it wins over these defaults. In a project that
    uses OBSIDIAN (gg-app, the GG website, Notchcast), the `design-system` skill wins wherever its rules differ from these (for
    example, OBSIDIAN allows uppercase for small labels and table column headers).
-5. Run `npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2 inventory` once: it shows the looks that already exist for buttons, inputs,
+5. Run `npx -y --allow-git=all github:Kaczor-Labs/ai-design-check#v0.16.3-fork.2 inventory` once: it shows the looks that already exist for buttons, inputs,
    headings, badges and cards. Use one of those; do not invent another.
 
 ## While you write
@@ -50,7 +50,7 @@ Run the checker and fix what it reports. When a rule does not apply, add an inli
 (`ai-design-check-ignore-next-line rule-id -- why`) or a config `allow` entry; never ignore to skip a fix:
 
 ```bash
-npx -y --allow-git=all github:kaczordodgers/ai-design-check#v0.16.3-fork.2
+npx -y --allow-git=all github:Kaczor-Labs/ai-design-check#v0.16.3-fork.2
 ```
 
 For the rules marked *review* (layout, selectors, empty states, contrast), look at the screen itself (screenshot
