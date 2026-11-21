@@ -16,7 +16,7 @@ Apply these rules whenever you build, change or review interface code.
    sub-tabs on the same row, pill chips only for filters (`selector-language`).
 4. Know the context: an app screen (dashboard, settings, tables) is dense and quiet; a marketing page may use display
    type and more colour. If the project has a DESIGN.md or a brief, it wins over these defaults. In a project that
-   uses OBSIDIAN (gg-app, gainsgeek.com, Notchcast), the `design-system` skill wins wherever its rules differ from these (for
+   uses OBSIDIAN (gg-app, the GG website, Notchcast), the `design-system` skill wins wherever its rules differ from these (for
    example, OBSIDIAN allows uppercase for small labels and table column headers).
 5. Run `npx -y --allow-git=all github:Kaczor-Labs/ai-design-check#v0.16.3-fork.2 inventory` once: it shows the looks that already exist for buttons, inputs,
    headings, badges and cards. Use one of those; do not invent another.
